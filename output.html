@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zebra Puzzle Solution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        pre {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Zebra Puzzle Solution</h1>
+    <pre id="solution"></pre>
+    <script>
+        // Define possible values for each attribute
+        const colors = ["red", "green", "yellow", "blue", "ivory"];
+        const nationalities = ["Englishman", "Spaniard", "Ukrainian", "Norwegian", "Japanese"];
+        const drinks = ["coffee", "tea", "milk", "orange juice", "water"];
+        const cigarettes = ["Kools", "Chesterfields", "Old Gold", "Lucky Strike", "Parliaments"];
+        const pets = ["dog", "snails", "fox", "horse", "zebra"];
+
+        // Initialize house slots to fill in
+        const houses = Array(5).fill(null).map(() => ({}));
+
+        function isValidAssignment(houses) {
+            // Constraint examples (fill with the Zebra Puzzle's full constraints)
+            if (houses[0].nationality && houses[0].nationality !== "Norwegian") {
+                return false;
+            }
+
+            for (let house of houses) {
+                if (house.nationality === "Englishman" && house.color !== "red") {
+                    return false;
+                }
+                if (house.color === "red" && house.nationality !== "Englishman") {
+                    return false;
+                }
+            }
+
+            // Ensure uniqueness of attributes across houses
+            const attributes = ["color", "nationality", "drink", "cigarette", "pet"];
+            for (let attr of attributes) {
+                const seen = new Set();
+                for (let house of houses) {
+                    if (house[attr]) {
+                        if (seen.has(house[attr])) {
+                            return false;
+                        }
+                        seen.add(house[attr]);
+                    }
+                }
+            }
+            return true;
+        }
+
+        function solveZebraPuzzle(index = 0) {
+            if (index === 5) {
+                if (isValidAssignment(houses)) {
+                    return houses;
+                }
+                return null;
+            }
+
+            for (let color of colors) {
+                for (let nationality of nationalities) {
+                    for (let drink of drinks) {
+                        for (let cigarette of cigarettes) {
+                            for (let pet of pets) {
+                                houses[index] = {
+                                    color: color,
+                                    nationality: nationality,
+                                    drink: drink,
+                                    cigarette: cigarette,
+                                    pet: pet,
+                                };
+
+                                if (isValidAssignment(houses)) {
+                                    const result = solveZebraPuzzle(index + 1);
+                                    if (result) {
+                                        return result;
+                                    }
+                                }
+                                houses[index] = {}; // Reset assignment
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Run the solver and display the solution
+        const solution = solveZebraPuzzle();
+        const solutionElement = document.getElementById('solution');
+        if (solution) {
+            solution.forEach((house, index) => {
+                solutionElement.innerHTML += `House ${index + 1}: ${JSON.stringify(house)}\n`;
+            });
+        } else {
+            solutionElement.innerHTML = "No solution found.";
+        }
+    </script>
+</body>
+</html>
